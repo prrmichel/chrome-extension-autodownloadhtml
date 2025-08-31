@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Auto HTML Downloader",
+  "version": "1.0",
+  "description": "Automatically saves the page HTML, screenshot and metadata to disk on page load.",
+  "permissions": ["downloads", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
