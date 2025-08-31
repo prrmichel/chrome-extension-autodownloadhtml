@@ -18,7 +18,8 @@ Metadata includes the page URL, title, timestamp, and all links found on the pag
 2. All files are downloaded automatically to your default download folder.
 
 ## Usage
-- Browse as usual; files will be saved automatically for each tab.
+- Browse as usual. Files will be saved automatically for each tab.
+  - :warning: To disable automatic downloads, you can disable the extension from the Chrome extensions page.
 - To manually trigger downloads, use the extension's messaging API (feature not tested).
 
 ### Usage with Messaging API
