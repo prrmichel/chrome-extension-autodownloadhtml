@@ -199,7 +199,6 @@ async function saveHtmlForTab(tabId, tabUrl, timestamp, title) {
     }
 }
 
-// Get all links from the current tab
 async function getAllLinksForTab(tabId) {
     const [result] = await chrome.scripting.executeScript({
         target: {tabId},
@@ -211,15 +210,31 @@ async function getAllLinksForTab(tabId) {
     return (result && result.result) || [];
 }
 
+async function getJsUrls(tabId) {
+    const [result] = await chrome.scripting.executeScript({
+        target: {tabId},
+        func: () => {
+            const urls = Array.from(document.querySelectorAll('script[src]'))
+                .map(script => script.src)
+                .filter(src => src && src.startsWith('https')
+                );
+            return Array.from(new Set(urls));
+        }
+    });
+    return (result && result.result) || [];
+}
+
 // Save JSON metadata of the current tab
 async function saveJsonForTab(tabId, tabUrl, timestamp, title) {
     try {
         const links = await getAllLinksForTab(tabId);
+        const jsUrls = await getJsUrls(tabId);
         const metadata = {
             url: tabUrl,
             savedAt: timestamp,
             title: title,
-            links: links
+            links: links,
+            javascriptFilesUrls: jsUrls,
         };
         const filename = generateFilenameForTabUrl(title, timestamp, 'json');
         const jsonString = JSON.stringify(metadata, null, 2);
@@ -292,7 +307,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     // if message type is not recognized, ignore
     if (!message || !message.type) return;
     // if message type is not a known type, ignore
-    const validTypes = ['SAVE_HTML_FOR_TAB', 'SAVE_SCREENSHOT_FOR_TAB', 'SAVE_JSON_FOR_TAB', 'SAVE_ALL_FOR_TAB'];
+    const validTypes = ['SAVE_HTML_FOR_TAB', 'SAVE_SCREENSHOT_FOR_TAB', 'SAVE_METADATA_FOR_TAB', 'SAVE_ALL_FOR_TAB'];
     if (!validTypes.includes(message.type)) return;
 
     const tabId = message.tabId || (sender && sender.tab && sender.tab.id);
@@ -309,7 +324,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         case 'SAVE_SCREENSHOT_FOR_TAB':
             saveScreenshotForTab(tabId, tabUrl, timestamp, title).then(sendResponse);
             return true;
-        case 'SAVE_JSON_FOR_TAB':
+        case 'SAVE_METADATA_FOR_TAB':
             saveJsonForTab(tabId, tabUrl, timestamp, title).then(sendResponse);
             return true;
         case 'SAVE_ALL_FOR_TAB':
