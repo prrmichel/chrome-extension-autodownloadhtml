@@ -3,9 +3,12 @@
   "name": "Auto HTML Downloader",
   "version": "1.0",
   "description": "Automatically saves the page HTML, screenshot and metadata to disk on page load.",
-  "permissions": ["downloads", "scripting"],
+  "permissions": ["downloads", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
   }
 }

@@ -295,11 +295,18 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (!(changeInfo.status === 'complete' && tab && tab.url && !tab.url.startsWith('chrome://'))) {
         return;
     }
-    const timestamp = formatTimestamp();
-    const title = await getTitleForTab(tabId);
-    saveHtmlForTab(tabId, tab.url, timestamp, title);
-    saveScreenshotForTab(tabId, tab.url, timestamp, title);
-    saveJsonForTab(tabId, tab.url, timestamp, title);
+    // Check if auto extraction is enabled
+    chrome.storage.sync.get(['autoExtractEnabled'], async (result) => {
+        if (result.autoExtractEnabled === false) {
+            // Disabled by user
+            return;
+        }
+        const timestamp = formatTimestamp();
+        const title = await getTitleForTab(tabId);
+        saveHtmlForTab(tabId, tab.url, timestamp, title);
+        saveScreenshotForTab(tabId, tab.url, timestamp, title);
+        saveJsonForTab(tabId, tab.url, timestamp, title);
+    });
 });
 
 // Expose an explicit message-based API for manual triggers if needed
