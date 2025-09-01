@@ -295,9 +295,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (!(changeInfo.status === 'complete' && tab && tab.url && !tab.url.startsWith('chrome://'))) {
         return;
     }
-    chrome.storage.sync.get(['autoExtractEnabled'], async (result) => {
-        if (result.autoExtractEnabled === false) {
-            // Disabled by user
+    // Check per-tab extraction setting
+    chrome.storage.local.get(['autoExtractTab'], async (result) => {
+        const tabSettings = result.autoExtractTab || {};
+        if (tabSettings[tabId] === false) {
+            // Disabled for this tab
             return;
         }
         const timestamp = formatTimestamp();
