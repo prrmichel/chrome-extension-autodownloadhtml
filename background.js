@@ -283,11 +283,33 @@ function formatTimestamp() {
 }
 
 async function getTitleForTab(tabId) {
-    const [titleResult] = await chrome.scripting.executeScript({
+    const [result] = await chrome.scripting.executeScript({
         target: {tabId},
-        func: () => document.title
+        func: () => {
+            const title = (document.title || '').trim();
+            const h1 = (document.querySelector('h1') && document.querySelector('h1').innerText) ? document.querySelector('h1').innerText.trim() : '';
+            // Return both so the caller can concatenate them safely
+            return { title, h1 };
+        }
     });
-    return (titleResult && titleResult.result) || 'Untitled';
+    const data = (result && result.result) || { title: '', h1: '' };
+    const titlePart = data.title || '';
+    const h1Part = data.h1 || '';
+
+    const normalize = (s) => (s || '').replace(/\s+/g, ' ').trim();
+    const normTitle = normalize(titlePart).toLowerCase();
+    const normH1 = normalize(h1Part).toLowerCase();
+
+    let combined;
+    // treat as duplicate when title contains h1 (or equals)
+    if (normTitle && normH1 && (normTitle === normH1 || normTitle.includes(normH1))) {
+        combined = normalize(titlePart) || 'Untitled';
+    } else if (titlePart && h1Part) {
+        combined = `${titlePart} - ${h1Part}`;
+    } else {
+        combined = titlePart || h1Part || 'Untitled';
+    }
+    return combined;
 }
 
 // Listen for completed navigations and save the HTML

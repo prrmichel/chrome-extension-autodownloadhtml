@@ -14,7 +14,10 @@
   "commands": {
     "extract_now": {
       "suggested_key": {
-        "default": "Ctrl+Shift+X"
+        "default": "Ctrl+Shift+X",
+        "mac": "Command+Shift+X",
+        "linux": "Ctrl+Shift+X",
+        "windows": "Ctrl+Shift+X"
       },
       "description": "Trigger extraction for the current tab"
     }
