@@ -9,6 +9,8 @@ Metadata includes the page URL, title, timestamp...
 - **Automatic HTML download** : Saves the full HTML of each visited tab.
 - **Full-page screenshots** : Captures the entire page, not just the visible area.
 - **Metadata JSON** : Stores URL, title, timestamp, javascript files urls and all links from the page.
+- **Customizable options** : Enable/disable automatic downloads by tab.
+- **Keyboard shortcut** : Manually trigger downloads with Ctrl+Shift+X (Cmd+Shift+X on Mac).
 
 ## How It Works
 1. When a tab finishes loading, the extension:
@@ -17,9 +19,13 @@ Metadata includes the page URL, title, timestamp...
    - Extracts metadata... then saves as JSON.
 2. All files are downloaded automatically to your default download folder.
 
+:warning: Sometimes, due to delays in page loading or dynamic content, the extension may not capture everything perfectly. You can manually trigger the download process using the keyboard shortcut.
+
 ## Usage
 - Browse as usual. Files will be saved automatically for each tab.
-  - :warning: To disable automatic downloads, you can disable the extension from the Chrome extensions page.
+  - :warning: You can disable automatic downloads in the extension options.
+- To manually trigger downloads, you can use keyboard shortcut : Ctrl+Shift+X.
+  - Mac: Command+Shift+X.
 - To manually trigger downloads, use the extension's messaging API (feature not tested).
 
 ### Usage with Messaging API
@@ -33,3 +39,4 @@ The message types are:
 ## Permissions Required
 - `downloads`: To save files automatically.
 - `scripting`: To run scripts in tabs for HTML, screenshot, and link extraction.
+- `storage`: To save user preferences.
