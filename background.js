@@ -295,12 +295,29 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (!(changeInfo.status === 'complete' && tab && tab.url && !tab.url.startsWith('chrome://'))) {
         return;
     }
-    // Check if auto extraction is enabled
     chrome.storage.sync.get(['autoExtractEnabled'], async (result) => {
         if (result.autoExtractEnabled === false) {
             // Disabled by user
             return;
         }
+        const timestamp = formatTimestamp();
+        const title = await getTitleForTab(tabId);
+        saveHtmlForTab(tabId, tab.url, timestamp, title);
+        saveScreenshotForTab(tabId, tab.url, timestamp, title);
+        saveJsonForTab(tabId, tab.url, timestamp, title);
+    });
+});
+
+// Listen for keyboard shortcut command to trigger extraction
+chrome.commands.onCommand.addListener(async (command) => {
+    if (command !== 'extract_now') {
+        return;
+    }
+    chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
+        if (!tabs || !tabs.length) return;
+        const tab = tabs[0];
+        if (!tab.id || !tab.url || tab.url.startsWith('chrome://')) return;
+        const tabId = tab.id;
         const timestamp = formatTimestamp();
         const title = await getTitleForTab(tabId);
         saveHtmlForTab(tabId, tab.url, timestamp, title);
