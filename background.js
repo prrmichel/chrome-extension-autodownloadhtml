@@ -328,6 +328,16 @@ chrome.commands.onCommand.addListener(async (command) => {
     });
 });
 
+// Listen for new tab creation and set autoExtractTab default to false
+chrome.tabs.onCreated.addListener((tab) => {
+    if (!tab || typeof tab.id === 'undefined') return;
+    chrome.storage.local.get(['autoExtractTab'], (result) => {
+        const tabSettings = result.autoExtractTab || {};
+        tabSettings[tab.id] = false;
+        chrome.storage.local.set({ autoExtractTab: tabSettings });
+    });
+});
+
 // Expose an explicit message-based API for manual triggers if needed
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     // if message type is not recognized, ignore
